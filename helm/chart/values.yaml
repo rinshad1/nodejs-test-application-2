@@ -2,16 +2,24 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+resources:
+  limits:
+    cpu: 300m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
 replicaCount: 1
 
 image:
-  repository: registry001100.azurecr.io/rinshaddockernodejs-dev    ###rinshad11/nodeapp00
-  tag: latest
+  repository: nodeappsrinshad.azurecr.io/test-imagess-2    ###rinshad11/nodeapp00
+  tag: 7425bb3-20240110072138
   pullPolicy: Always
 
 service:
   type: ClusterIP
-  port: 4000
+  port: 3000
 
 ingress:
   enabled: false
@@ -26,13 +34,11 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
-resources:
-  limits:
-    cpu: 300m
-    memory: 512Mi
-  requests:
-    cpu: 100m
-    memory: 128Mi
+hpa:
+  enabled: true
+  maxReplicas: 2
+  minReplicas: 1
+  targetCPUUtilizationPercentage: 70
 
 nodeSelector: {}
 
