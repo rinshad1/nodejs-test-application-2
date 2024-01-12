@@ -14,7 +14,7 @@ replicaCount: 1
 
 image:
   repository: nodeappsrinshad.azurecr.io/test-imagess-2    ###rinshad11/nodeapp00
-  tag: xxlatestxx
+  tag: latest
   pullPolicy: Always
   
 service:
