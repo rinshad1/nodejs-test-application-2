@@ -12,6 +12,9 @@ resources:
 
 replicaCount: 1
 
+env:
+  name: password
+  value: "MyValue"
 image:
   repository: nodeappsrinshad.azurecr.io/test-imagess-2    ###rinshad11/nodeapp00
   tag: latest
