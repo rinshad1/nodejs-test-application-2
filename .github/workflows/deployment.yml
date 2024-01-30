@@ -20,11 +20,7 @@ jobs:
 
     steps:
       
-    - name: image tag
-      run: |
-        IMAGE_TAG=$(git describe --exact-match --tags $(git log -n1 --pretty='%h'))
-        echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
-        echo $IMAGE_TAG
+   
      
     # - name: Set short git commit SHA
     #   id: commit
@@ -44,7 +40,11 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-    
+    - name: image tag
+      run: |
+        IMAGE_TAG=$(git describe --exact-match --tags $(git log -n1 --pretty='%h'))
+        echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+        echo $IMAGE_TAG
       
         
     - name: Build, tag, and push image to Amazon ECR
