@@ -1,126 +1,59 @@
-# This workflow will build and push an application to a Azure Kubernetes Service (AKS) cluster when you push your code
-#
-# This workflow assumes you have already created the target AKS cluster and have created an Azure Container Registry (ACR)
-# The ACR should be attached to the AKS cluster
-# For instructions see:
-#   - https://docs.microsoft.com/en-us/azure/aks/kubernetes-walkthrough-portal
-#   - https://docs.microsoft.com/en-us/azure/container-registry/container-registry-get-started-portal
-#   - https://learn.microsoft.com/en-us/azure/aks/cluster-container-registry-integration?tabs=azure-cli#configure-acr-integration-for-existing-aks-clusters
-#   - https://github.com/Azure/aks-create-action
-#
-# To configure this workflow:
-#
-# 1. Set the following secrets in your repository (instructions for getting these
-#    https://docs.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-cli%2Clinux)):
-#    - AZURE_CLIENT_ID
-#    - AZURE_TENANT_ID
-#    - AZURE_SUBSCRIPTION_ID
-#
-# 2. Set the following environment variables (or replace the values below):
-#    - AZURE_CONTAINER_REGISTRY (name of your container registry / ACR)
-#    - CONTAINER_NAME (name of the container image you would like to push up to your ACR)
-#    - RESOURCE_GROUP (where your cluster is deployed)
-#    - CLUSTER_NAME (name of your AKS cluster)
-#    - IMAGE_PULL_SECRET_NAME (name of the ImagePullSecret that will be created to pull your ACR image)
-#
-# 3. Choose the appropriate render engine for the bake step https://github.com/Azure/k8s-bake. The config below assumes Helm.
-#    Set your helmChart, overrideFiles, overrides, and helm-version to suit your configuration.
-#    - CHART_PATH (path to your helm chart)
-#    - CHART_OVERRIDE_PATH (path to your helm chart with override values)
-#
-# For more information on GitHub Actions for Azure, refer to https://github.com/Azure/Actions
-# For more samples to get started with GitHub Action workflows to deploy to Azure, refer to https://github.com/Azure/actions-workflow-samples
-# For more options with the actions used below please refer to https://github.com/Azure/login
-
-name: Build and deploy an app to AKS with Helm
+name: Deploy to ECR
 
 on:
+ 
   push:
-    branches: ["main"]
-  workflow_dispatch:
+    branches: [ main ]
 
 env:
-  AZURE_CONTAINER_REGISTRY: "your-azure-container-registry"
-  CONTAINER_NAME: "your-container-name"
-  RESOURCE_GROUP: "your-resource-group"
-  CLUSTER_NAME: "your-cluster-name"
-  CHART_PATH: "your-chart-path"
-  CHART_OVERRIDE_PATH: "your-chart-override-path"
+  ECR_REPOSITORY: repo-dev
+  EKS_CLUSTER_NAME: eks-cluster-07 
+  AWS_REGION: us-west-1
 
 jobs:
-  buildImage:
-    permissions:
-      contents: read
-      id-token: write
+  
+  build:
+    
+    name: Deployment
     runs-on: ubuntu-latest
+
     steps:
-      # Checks out the repository this file is in
-      - uses: actions/checkout@v3
 
-      # Logs in with your Azure credentials
-      - name: Azure login
-        uses: azure/login@v1.4.6
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    - name: Set short git commit SHA
+      id: commit
+      uses: prompt/actions-commit-hash@v2
 
-      # Builds and pushes an image up to your Azure Container Registry
-      - name: Build and push image to ACR
-        run: |
-          az acr build --image ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_NAME }}:${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.RESOURCE_GROUP }} .
+    - name: Check out code
+      uses: actions/checkout@v2
+    
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{env.AWS_REGION}}
 
-  deploy:
-    permissions:
-      actions: read
-      contents: read
-      id-token: write
-    runs-on: ubuntu-latest
-    needs: [buildImage]
-    steps:
-      # Checks out the repository this file is in
-      - uses: actions/checkout@v3
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
 
-      # Logs in with your Azure credentials
-      - name: Azure login
-        uses: azure/login@v1.4.6
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    - name: Build, tag, and push image to Amazon ECR
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}        
+        IMAGE_TAG: ${{ steps.commit.outputs.short }}
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Application/ .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-      # Use kubelogin to configure your kubeconfig for Azure auth
-      - name: Set up kubelogin for non-interactive login
-        uses: azure/use-kubelogin@v1
-        with:
-          kubelogin-version: 'v0.0.25'
+    - name: Update kube config
+      run: aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
 
-      # Retrieves your Azure Kubernetes Service cluster's kubeconfig file
-      - name: Get K8s context
-        uses: azure/aks-set-context@v3
-        with:
-          resource-group: ${{ env.RESOURCE_GROUP }}
-          cluster-name: ${{ env.CLUSTER_NAME }}
-          admin: 'false'
-          use-kubelogin: 'true'
-
-      # Runs Helm to create manifest files
-      - name: Bake deployment
-        uses: azure/k8s-bake@v2
-        with:
-          renderEngine: "helm"
-          helmChart: ${{ env.CHART_PATH }}
-          overrideFiles: ${{ env.CHART_OVERRIDE_PATH }}
-          overrides: |
-            replicas:2
-          helm-version: "latest"
-        id: bake
-
-      # Deploys application based on manifest files from previous step
-      - name: Deploy application
-        uses: Azure/k8s-deploy@v4
-        with:
-          action: deploy
-          manifests: ${{ steps.bake.outputs.manifestsBundle }}
-          images: |
-            ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_NAME }}:${{ github.sha }}
+    - name: Deploy to EKS
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}        
+        IMAGE_TAG: ${{ steps.commit.outputs.short }}
+      run: |
+        # sed -i.bak "s|DOCKER_IMAGE|$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG|g" manifests/hello-app-deployment.yaml && \
+        # kubectl apply -f manifests/hello-app-deployment.yaml
+        # kubectl apply -f manifests/hello-app-service.yaml
+        helm upgrade --install nodeapp-33 helm/chart/ --set image.tag=$IMAGE_TAG
