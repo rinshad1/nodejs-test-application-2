@@ -20,10 +20,15 @@ jobs:
 
     steps:
       
-    
-    - name: Set short git commit SHA
-      id: commit
-      uses: prompt/actions-commit-hash@v2
+    - name: image tag
+      run: |
+        IMAGE_TAG=$(git describe --exact-match --tags $(git log -n1 --pretty='%h'))
+        echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+        echo $IMAGE_TAG
+     
+    # - name: Set short git commit SHA
+    #   id: commit
+    #   uses: prompt/actions-commit-hash@v2
 
     - name: Check out code
       uses: actions/checkout@v2
@@ -39,12 +44,7 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-    - name: image tag
-      run: |
-        IMAGE_TAG2=$(git describe --exact-match --tags $(git log -n1 --pretty='%h'))
-        echo "IMAGE_TAG2=$IMAGE_TAG2" >> $GITHUB_ENV
-        echo $IMAGE_TAG2
-     
+    
       
         
     - name: Build, tag, and push image to Amazon ECR
@@ -53,8 +53,7 @@ jobs:
         # IMAGE_TAG: ${{ steps.commit.outputs.short }}
         # IMAGE_TAG2: $(git describe --exact-match --tags $(git log -n1 --pretty='%h'))
       run: |
-        echo $IMAGE_TAG2
-        echo 
+        echo $IMAGE_TAG
         pwd
         ls
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Application/Dockerfile .
