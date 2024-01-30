@@ -16,7 +16,7 @@ env:
   name: password
   value: "MyValue"
 image:
-  repository: nodeappsrinshad.azurecr.io/test-imagess-2    ###rinshad11/nodeapp00
+  repository: 039033235676.dkr.ecr.us-west-2.amazonaws.com/repo-dev    ###rinshad11/nodeapp00
   tag: latest
   pullPolicy: Always
   
