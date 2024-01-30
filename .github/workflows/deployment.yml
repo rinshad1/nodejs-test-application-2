@@ -82,6 +82,6 @@ jobs:
     - name: Deploy to EKS
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}        
-        IMAGE_TAG: ${{ steps.commit.outputs.short }}
+        # IMAGE_TAG: ${{ steps.commit.outputs.short }}
       run: |
         helm upgrade --install nodeapp-33 helm/chart/ --set image.tag=$IMAGE_TAG
