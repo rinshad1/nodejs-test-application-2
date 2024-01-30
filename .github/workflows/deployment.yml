@@ -43,6 +43,8 @@ jobs:
         IMAGE_TAG: ${{ steps.commit.outputs.short }}
       run: |
         echo $IMAGE_TAG
+        pwd
+        ls
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Application/ .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
     
