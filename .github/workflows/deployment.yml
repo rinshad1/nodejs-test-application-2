@@ -8,7 +8,7 @@ on:
 
 env:
   ECR_REPOSITORY: repo-dev
-  EKS_CLUSTER_NAME: eks-cluster-07 
+  EKS_CLUSTER_NAME: eks-cluster-123 
   AWS_REGION: us-west-2
 
 jobs:
@@ -20,12 +20,6 @@ jobs:
 
     steps:
       
-   
-     
-    # - name: Set short git commit SHA
-    #   id: commit
-    #   uses: prompt/actions-commit-hash@v2
-
     - name: Check out code
       uses: actions/checkout@v2
     
@@ -46,16 +40,11 @@ jobs:
         echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
         echo $IMAGE_TAG
       
-        
     - name: Build, tag, and push image to Amazon ECR
       env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}        
-        # IMAGE_TAG: ${{ steps.commit.outputs.short }}
-        # IMAGE_TAG2: $(git describe --exact-match --tags $(git log -n1 --pretty='%h'))
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
       run: |
-        echo $IMAGE_TAG
-        pwd
-        ls
+        echo $ECR_REGISTRY
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Application/Dockerfile .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
     
@@ -73,15 +62,14 @@ jobs:
 
     - name: Connect VPN
       run: |
-          pritunl-client add ./user-2.tar
+          pritunl-client add ./user-3.tar
           pritunl-client start "$(pritunl-client list | awk 'NR>2 {print $2}' | tr -d '[:space:]')" --password ${{ secrets.PRITUNL_PIN }} 
         
     - name: Update kube config
       run: aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
 
     - name: Deploy to EKS
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}        
-        # IMAGE_TAG: ${{ steps.commit.outputs.short }}
+      # env:
+      #   ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}        
       run: |
         helm upgrade --install nodeapp-33 helm/chart/ --set image.tag=$IMAGE_TAG
