@@ -21,15 +21,21 @@ image:
   pullPolicy: Always
   
 service:
-  type: LoadBalancer
+  type: ClusterIP
   port: 3000
 
 ingress:
   enabled: true
   annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
   path: /app
+  hosts:
+    - http://af1adc8d73cd344dcb1521bc9497ad10-630123407.us-west-2.elb.amazonaws.com
   tls: []
-
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
 
 hpa:
   enabled: true
