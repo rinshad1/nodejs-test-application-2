@@ -16,16 +16,16 @@ env:
   name: password
   value: "MyValue"
 image:
-  repository: 039033235676.dkr.ecr.us-west-2.amazonaws.com/repo-dev    ###rinshad11/nodeapp00
+  repository: REPO_URL   
   tag: latest
   pullPolicy: Always
   
 service:
-  type: ClusterIP
+  type: LoadBalancer
   port: 3000
 
 ingress:
-  enabled: true
+  enabled: false
   annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
