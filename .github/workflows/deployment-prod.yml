@@ -35,6 +35,8 @@ jobs:
 
     - name: image tag
       run: |
+        git branch
+        git describe --exact-match --tags $(git log -n1 --pretty='%h' origin/main)
         IMAGE_TAG=$(git describe --exact-match --tags $(git log -n1 --pretty='%h' origin/main))
         echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
         echo $IMAGE_TAG
