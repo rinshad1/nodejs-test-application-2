@@ -21,11 +21,11 @@ image:
   pullPolicy: Always
 
 service:
-  type: ClusterIP
+  type: LoadBalancer
   port: 3000
 
 ingress:
-  enabled: true
+  enabled: false
   ingressClassName: traefik
   annotations: {}
   path: /

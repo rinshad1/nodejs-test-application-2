@@ -1,13 +1,12 @@
-name: Deploy to DEVELOPMENT EKS
+name: Deploy to PRODUCTION EKS
 
 on:
- 
-  push:
-    tags:
-      - "*"
+    pull_request:
+      branches:
+      - main
 
 env:
-  ECR_REPOSITORY: repo-dev
+  ECR_REPOSITORY: repo-prod
   EKS_CLUSTER_NAME: eks-cluster-123 
   AWS_REGION: us-west-2
 
@@ -71,10 +70,10 @@ jobs:
         
     - name: Set environment variable
       env:
-        repourl: ${{ vars.REPO_URL }}
+        repourl: ${{ vars.PROD_REPO_URL }}
       run: |
-        sed -i "s#REPO_URL#${repourl}#g" helm/chart/values.yaml    
+        sed -i "s#REPO_URL#${repourl}#g" helm/chart/values-prod.yaml    
 
     - name: Deploy to EKS       
       run: |
-        helm upgrade --install nodeapp-33 helm/chart/ -n dev --create-namespace --set image.tag=$IMAGE_TAG
+        helm upgrade --install nodeapp-prod helm/chart/values-prod.yaml -n prod --create-namespace --set image.tag=$IMAGE_TAG
