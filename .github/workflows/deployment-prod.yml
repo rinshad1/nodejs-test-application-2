@@ -35,6 +35,7 @@ jobs:
 
     - name: image tag
       run: |
+        git fetch origin
         git branch
         git describe --exact-match --tags $(git log -n1 --pretty='%h' origin/main)
         IMAGE_TAG=$(git describe --exact-match --tags $(git log -n1 --pretty='%h' origin/main))
