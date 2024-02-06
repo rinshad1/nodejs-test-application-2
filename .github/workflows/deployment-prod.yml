@@ -3,7 +3,7 @@ name: Deploy to PRODUCTION EKS
 on:
     pull_request:
       branches:
-      - main
+      - prod
 
 env:
   ECR_REPOSITORY: repo-prod
