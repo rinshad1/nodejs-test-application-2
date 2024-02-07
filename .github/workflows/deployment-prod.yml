@@ -79,4 +79,5 @@ jobs:
 
     - name: Deploy to EKS       
       run: |
-        helm upgrade --install nodeapp-prod -f helm/chart/values-prod.yaml -n prod --create-namespace --set image.tag=$IMAGE_TAG
+        helm upgrade --install nodeapp-prod helm/chart -f helm/chart/values-prod.yaml -n prod --create-namespace --set image.tag=$IMAGE_TAG
+
