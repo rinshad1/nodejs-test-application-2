@@ -62,7 +62,7 @@ jobs:
 
     - name: Connect VPN
       run: |
-          pritunl-client add ./user-6.tar
+          pritunl-client add ./user-7.tar
           pritunl-client start "$(pritunl-client list | awk 'NR>2 {print $2}' | tr -d '[:space:]')" --password ${{ secrets.PRITUNL_PIN }} 
         
     - name: Update kube config
@@ -77,4 +77,4 @@ jobs:
 
     - name: Deploy to EKS       
       run: |
-        helm upgrade --install nodeapp-33 helm/chart/ -n dev --create-namespace --set image.tag=$IMAGE_TAG
+        helm upgrade --install nodeapp-dev helm/chart/ -n dev --create-namespace --set image.tag=$IMAGE_TAG
