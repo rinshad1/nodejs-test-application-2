@@ -32,11 +32,11 @@ spec:
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /
+              path: /app
               port: http
           readinessProbe:
             httpGet:
-              path: /
+              path: /app
               port: http
           resources:
 {{ toYaml .Values.resources | indent 12 }}
@@ -52,5 +52,5 @@ spec:
       tolerations:
 {{ toYaml . | indent 8 }}
     {{- end }}
-      imagePullSecrets:
-        - name: dc-2fjvj
+      # imagePullSecrets:
+      #   - name: dc-2fjvj
