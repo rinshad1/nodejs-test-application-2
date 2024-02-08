@@ -62,7 +62,7 @@ jobs:
 
     - name: Connect VPN
       run: |
-          pritunl-client add ./user-7.tar
+          pritunl-client add ./user-8.tar
           pritunl-client start "$(pritunl-client list | awk 'NR>2 {print $2}' | tr -d '[:space:]')" --password ${{ secrets.PRITUNL_PIN }} 
         
     - name: Update kube config
