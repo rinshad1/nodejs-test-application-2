@@ -30,11 +30,11 @@ ingress:
   annotations: {}
   path: /app
   hosts:
-    - test.akhilsathyan.tech/prod
+    - test.akhilsathyan.tech.prod
   tls:
     - secretName: new-tls
       hosts:
-        - test.akhilsathyan.tech/prod
+        - test.akhilsathyan.tech
 
 hpa:
   enabled: true
