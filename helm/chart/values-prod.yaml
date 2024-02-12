@@ -34,7 +34,7 @@ ingress:
   tls:
     - secretName: new-tls
       hosts:
-        - test.akhilsathyan.tech
+        - test.akhilsathyan.tech/prod
 
 hpa:
   enabled: true
