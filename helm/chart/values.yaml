@@ -28,7 +28,7 @@ ingress:
   enabled: true
   ingressClassName: traefik
   annotations: {}
-  path: /
+  path: /app
   hosts:
     - test.akhilsathyan.tech
   tls:
