@@ -32,9 +32,9 @@ ingress:
   hosts:
     - test2.akhilsathyan.tech
   tls:
-    - secretName: new-tls
+    - secretName: new-tls2
       hosts:
-        - test.akhilsathyan.tech
+        - test2.akhilsathyan.tech
 
 hpa:
   enabled: true
