@@ -93,4 +93,4 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
       
       # Continue with the remaining steps as per your workflow
-######
+#######
