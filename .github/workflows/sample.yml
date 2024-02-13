@@ -87,7 +87,7 @@ jobs:
           fi
 
           # Generate the new version tag
-          IMAGE_TAG="v${MAJOR}.${MINOR}.${PATCH}"
+          IMAGE_TAG="${MAJOR}.${MINOR}.${PATCH}"
           echo $ECR_REGISTRY
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Application/Dockerfile .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
