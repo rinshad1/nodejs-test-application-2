@@ -36,7 +36,7 @@ jobs:
           # Extract commit message from the latest commit
           COMMIT_MESSAGE=$(git log -1 --pretty=%B)
 
-          # Check if the commit message contains keywords for patch, minor, or major release
+          # Determine the version type based on the commit message
           if echo "$COMMIT_MESSAGE" | grep -q 'BREAKING CHANGE'; then
             echo "::set-output name=version::major"
           elif echo "$COMMIT_MESSAGE" | grep -q 'feat'; then
@@ -45,13 +45,48 @@ jobs:
             echo "::set-output name=version::patch"
           fi
 
+      - name: Determine version update
+        id: determine-update
+        run: |
+          VERSION=$(echo ${{ steps.determine-version.outputs.version }})
+          if [ "$VERSION" = "major" ]; then
+            echo "::set-output name=update::major"
+          elif [ "$VERSION" = "minor" ]; then
+            echo "::set-output name=update::minor"
+          else
+            echo "::set-output name=update::patch"
+          fi
+
       - name: Build, tag, and push image to Amazon ECR
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
           VERSION=$(echo ${{ steps.determine-version.outputs.version }})
-          # Generate a tag in the format v0.0.0
-          IMAGE_TAG="v0.0.${{ github.run_number }}-${VERSION}"
+          UPDATE=$(echo ${{ steps.determine-update.outputs.update }})
+
+          # Determine the current version
+          CURRENT_VERSION=$(curl -sL https://api.github.com/repos/USERNAME/REPO/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')
+
+          # Parse the version numbers
+          IFS='.' read -r -a VERSION_ARRAY <<< "$CURRENT_VERSION"
+          MAJOR=${VERSION_ARRAY[0]}
+          MINOR=${VERSION_ARRAY[1]}
+          PATCH=${VERSION_ARRAY[2]}
+
+          # Update version numbers based on the release type
+          if [ "$UPDATE" = "major" ]; then
+            MAJOR=$((MAJOR + 1))
+            MINOR=0
+            PATCH=0
+          elif [ "$UPDATE" = "minor" ]; then
+            MINOR=$((MINOR + 1))
+            PATCH=0
+          else
+            PATCH=$((PATCH + 1))
+          fi
+
+          # Generate the new version tag
+          IMAGE_TAG="v${MAJOR}.${MINOR}.${PATCH}"
           echo $ECR_REGISTRY
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Application/Dockerfile .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
