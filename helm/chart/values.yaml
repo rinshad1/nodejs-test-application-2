@@ -21,7 +21,7 @@ image:
   pullPolicy: Always
 
 service:
-  type: LoadBalancer
+  type: ClusterIP
   port: 3000
 
 ingress:
@@ -30,7 +30,7 @@ ingress:
   annotations: {}
   path: /app
   hosts:
-    - test.akhilsathyan.tech
+    - test2.akhilsathyan.tech
   tls:
     - secretName: new-tls
       hosts:
