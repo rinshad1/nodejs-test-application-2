@@ -101,19 +101,18 @@ jobs:
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Application/Dockerfile .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-      # - name: Retrieve Latest Release ID
-      #   id: get-release-id
-      #   run: |
-      #     RELEASE_ID=$(curl -sL https://api.github.com/repos/rinshad1/nodejs-test-application/releases/latest | grep -oP '"id": \K[0-9]+')
-      #     echo "::set-output name=release-id::$RELEASE_ID"
+      - name: Retrieve Latest Release ID
+        id: get-release-id
+        run: |
+          RELEASE_ID=$(curl -sL https://api.github.com/repos/rinshad1/nodejs-test-application/releases/latest | grep -oP '"id": \K[0-9]+')
+          echo "::set-output name=release-id::$RELEASE_ID"
         
-      # - name: Update Release Tag
-      #   run: |
-      #     RELEASE_ID=${{ steps.get-release-id.outputs.release-id }}
-      #     NEW_TAG="v${MAJOR}.${MINOR}.${PATCH}"
-      #     curl -X PATCH -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-      #       -d '{"tag_name": "'"$NEW_TAG"'"}' \
-      #       "https://api.github.com/repos/rinshad1/nodejs-test-application/releases/$RELEASE_ID"
+      - name: Update Release Tag
+        run: |
+          RELEASE_ID=${{ steps.get-release-id.outputs.release-id }}
+          NEW_TAG="v${MAJOR}.${MINOR}.${PATCH}"
+          curl -X PATCH -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -d '{"tag_name": "'"$NEW_TAG"'"}' \
+            "https://api.github.com/repos/rinshad1/nodejs-test-application/releases/$RELEASE_ID"
                   
-      # # Continue with the remaining steps as per your workflow
-#
+      # Continue with the remaining steps as per your workflow
