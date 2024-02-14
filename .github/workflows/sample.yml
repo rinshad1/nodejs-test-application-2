@@ -96,16 +96,16 @@ jobs:
       - name: Retrieve Latest Release ID
         id: get-release-id
         run: |
-              RELEASE_ID=$(curl -sL https://api.github.com/repos/rinshad1/nodejs-test-application/releases/latest | grep -oP '"id": \K[0-9]+')
-              echo "::set-output name=release-id::$RELEASE_ID"
+              TAG_ID=$(curl -sL https://api.github.com/repos/rinshad1/nodejs-test-application/tags/latest | grep -oP '"id": \K[0-9]+')
+              echo "::set-output name=release-id::$TAG_ID"
             
       - name: Update Release Tag
         run: |
-              RELEASE_ID=${{ steps.get-release-id.outputs.release-id }}
+              TAG_ID=${{ steps.get-release-id.outputs.release-id }}
               NEW_TAG="v${MAJOR}.${MINOR}.${PATCH}"
               curl -X PATCH -H "Authorization: token ${{ secrets.IGITHUB_TOKEN }}" \
                 -d '{"tag_name": "'"$NEW_TAG"'"}' \
-                "https://api.github.com/repos/rinshad1/nodejs-test-application/releases/$RELEASE_ID"
+                "https://api.github.com/repos/rinshad1/nodejs-test-application/releases/$TAG_ID"
         
                   
       # Continue with the remaining steps as per your workflow
