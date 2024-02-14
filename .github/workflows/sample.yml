@@ -96,7 +96,6 @@ jobs:
         run: |
           VERSION=$(echo ${{ steps.update-version.outputs.new_version }})
           UPDATE=$(echo ${{ steps.determine-update.outputs.update }})
-          echo "${VERSION}"
 
           IMAGE_TAG="${VERSION}"
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Application/Dockerfile .
@@ -116,5 +115,4 @@ jobs:
       #       -d '{"tag_name": "'"$NEW_TAG"'"}' \
       #       "https://api.github.com/repos/rinshad1/nodejs-test-application/releases/$RELEASE_ID"
                   
-      # Continue with the remaining steps as per your workflow
-#########
+      # # Continue with the remaining steps as per your workflow
