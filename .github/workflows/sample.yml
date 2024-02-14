@@ -30,6 +30,10 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
+      - name: Read Current Version from VERSION file
+        id: read-version
+        run: echo "::set-output name=version::$(cat VERSION)"
+
       - name: Determine semantic version
         id: determine-version
         run: |
@@ -57,17 +61,12 @@ jobs:
             echo "::set-output name=update::patch"
           fi
 
-      - name: Build, tag, and push image to Amazon ECR
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+      - name: Update Version
+        id: update-version
         run: |
-          VERSION=$(echo ${{ steps.determine-version.outputs.version }})
-          UPDATE=$(echo ${{ steps.determine-update.outputs.update }})
+          CURRENT_VERSION=$(echo ${{ steps.read-version.outputs.version }})
+          VERSION_TYPE=$(echo ${{ steps.determine-version.outputs.version }})
 
-          # Determine the current version
-          #CURRENT_VERSION=0.0.0
-          CURRENT_VERSION=$(curl -sL https://api.github.com/repos/rinshad1/nodejs-test-application/tags/latest | grep -oP '"tag_name": "\K(.*)(?=")')
-          echo "$CURRENT_VERSION"
           # Parse the version numbers
           IFS='.' read -r -a VERSION_ARRAY <<< "$CURRENT_VERSION"
           MAJOR=${VERSION_ARRAY[0]}
@@ -75,38 +74,45 @@ jobs:
           PATCH=${VERSION_ARRAY[2]}
 
           # Update version numbers based on the release type
-          if [ "$UPDATE" = "major" ]; then
+          if [ "$VERSION_TYPE" = "major" ]; then
             MAJOR=$((MAJOR + 1))
             MINOR=0
             PATCH=0
-          elif [ "$UPDATE" = "minor" ]; then
+          elif [ "$VERSION_TYPE" = "minor" ]; then
             MINOR=$((MINOR + 1))
             PATCH=0
           else
             PATCH=$((PATCH + 1))
           fi
 
-          # Generate the new version tag
-          IMAGE_TAG="${MAJOR}.${MINOR}.${PATCH}"
-          echo $ECR_REGISTRY
+          # Generate the new version
+          NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+          echo "$NEW_VERSION" > VERSION
+          echo "::set-output name=new_version::$NEW_VERSION"
+
+      - name: Build, tag, and push image to Amazon ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          VERSION=$(echo ${{ steps.update-version.outputs.new_version }})
+          UPDATE=$(echo ${{ steps.determine-update.outputs.update }})
+
+          IMAGE_TAG="${VERSION}"
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Application/Dockerfile .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-      
 
-      - name: Retrieve Latest Release ID
-        id: get-release-id
-        run: |
-              TAG_ID=$(curl -sL https://api.github.com/repos/rinshad1/nodejs-test-application/tags/latest | grep -oP '"id": \K[0-9]+')
-              echo "::set-output name=release-id::$TAG_ID"
-            
-      - name: Update Release Tag
-        run: |
-              TAG_ID=${{ steps.get-release-id.outputs.release-id }}
-              NEW_TAG="v${MAJOR}.${MINOR}.${PATCH}"
-              curl -X PATCH -H "Authorization: token ${{ secrets.IGITHUB_TOKEN }}" \
-                -d '{"tag_name": "'"$NEW_TAG"'"}' \
-                "https://api.github.com/repos/rinshad1/nodejs-test-application/releases/$TAG_ID"
+      # - name: Retrieve Latest Release ID
+      #   id: get-release-id
+      #   run: |
+      #     RELEASE_ID=$(curl -sL https://api.github.com/repos/rinshad1/nodejs-test-application/releases/latest | grep -oP '"id": \K[0-9]+')
+      #     echo "::set-output name=release-id::$RELEASE_ID"
         
+      # - name: Update Release Tag
+      #   run: |
+      #     RELEASE_ID=${{ steps.get-release-id.outputs.release-id }}
+      #     NEW_TAG="v${MAJOR}.${MINOR}.${PATCH}"
+      #     curl -X PATCH -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+      #       -d '{"tag_name": "'"$NEW_TAG"'"}' \
+      #       "https://api.github.com/repos/rinshad1/nodejs-test-application/releases/$RELEASE_ID"
                   
       # Continue with the remaining steps as per your workflow
-############
