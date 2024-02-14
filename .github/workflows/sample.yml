@@ -66,7 +66,7 @@ jobs:
 
           # Determine the current version
           #CURRENT_VERSION=0.0.0
-          CURRENT_VERSION=$(curl -sL https://api.github.com/repos/rinshad1/nodejs-test-application/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')
+          CURRENT_VERSION=$(curl -sL https://api.github.com/repos/rinshad1/nodejs-test-application/tags/latest | grep -oP '"tag_name": "\K(.*)(?=")')
           echo "$CURRENT_VERSION"
           # Parse the version numbers
           IFS='.' read -r -a VERSION_ARRAY <<< "$CURRENT_VERSION"
