@@ -96,6 +96,7 @@ jobs:
         run: |
           VERSION=$(echo ${{ steps.update-version.outputs.new_version }})
           UPDATE=$(echo ${{ steps.determine-update.outputs.update }})
+          echo "${VERSION}"
 
           IMAGE_TAG="${VERSION}"
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Application/Dockerfile .
