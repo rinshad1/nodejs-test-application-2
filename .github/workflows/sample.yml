@@ -70,7 +70,7 @@ jobs:
       - name: Update Version
         id: update-version
         run: |
-          CURRENT_VERSION="v1.0.0"   #$(echo ${{ steps.read-version.outputs.version }})
+          CURRENT_VERSION=$(echo ${{ steps.read-version.outputs.version }})
           VERSION_TYPE=$(echo ${{ steps.determine-version.outputs.version }})
 
           # Parse the version numbers
