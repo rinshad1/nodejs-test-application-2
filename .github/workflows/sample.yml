@@ -1,4 +1,4 @@
-name: Deploy to DEVELOPMENT EKS
+name: sample Test
 
 on:
   push:
@@ -25,9 +25,9 @@ jobs:
         uses: d3p1/semantic-releasify@v1.1.0
         with:
         # The branch on which release should happen
-          branch: # optional, default is ${{ github.ref_name }}
+          branch: main
         # The Git tag format used by semantic-release to identify releases
-          tag-format: # optional, default is v${version}
+          tag-format: v.0.0.0
       - run: echo "version is  ${version}"    
       
       - name: Configure AWS credentials
