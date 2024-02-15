@@ -52,7 +52,7 @@ jobs:
           # Determine the version type based on the commit message
           if echo "$COMMIT_MESSAGE" | grep -q 'BREAKING CHANGE'; then
             echo "::set-output name=version::major"
-          elif echo "$COMMIT_MESSAGE" | grep -q 'feat'; then
+          elif echo "$COMMIT_MESSAGE" | grep -q 'FEAT'; then
             echo "::set-output name=version::minor"
           else
             echo "::set-output name=version::patch"
