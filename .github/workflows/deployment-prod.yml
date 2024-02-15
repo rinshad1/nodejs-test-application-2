@@ -73,7 +73,7 @@ jobs:
     - name: Update Version
       id: update-version
       run: |
-          CURRENT_VERSION="v1.0.2"    #$(echo ${{ steps.read-version.outputs.version }})
+          CURRENT_VERSION=$(echo ${{ steps.read-version.outputs.version }})
           VERSION_TYPE=$(echo ${{ steps.determine-version.outputs.version }})
 
           # Parse the version numbers
@@ -139,5 +139,10 @@ jobs:
 
     - name: Deploy to EKS       
       run: |
+        VERSION=$(echo ${{ steps.update-version.outputs.new_version }})
+        UPDATE=$(echo ${{ steps.determine-update.outputs.update }})
+
+        IMAGE_TAG="${VERSION}"
+        echo "new tag is : $IMAGE_TAG"
         helm upgrade --install nodeapp-prod helm/chart -f helm/chart/values-prod.yaml -n prod --create-namespace --set image.tag=$IMAGE_TAG
 
