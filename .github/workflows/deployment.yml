@@ -136,5 +136,5 @@ jobs:
 
       - name: Deploy to EKS       
         run: |
-          echo "$IMAGE_TAG"
+          echo "new tag is : $IMAGE_TAG"
           helm upgrade --install nodeapp-dev helm/chart/ -n dev --create-namespace --set image.tag=$IMAGE_TAG
