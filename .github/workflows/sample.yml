@@ -27,7 +27,7 @@ jobs:
         # The branch on which release should happen
           branch: main
         # The Git tag format used by semantic-release to identify releases
-          tag-format: v.0.0.0
+          tag-format: "${version}"
       - run: echo "version is  ${version}"    
       
       - name: Configure AWS credentials
