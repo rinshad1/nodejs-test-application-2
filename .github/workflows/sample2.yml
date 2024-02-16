@@ -28,7 +28,7 @@ jobs:
       run: |
         echo "New version: ${{ steps.semantic_release.outputs.new_version }}"
         echo "Previous version: ${{ steps.semantic_release.outputs.previous_version }}"
-        echo "Next version: ${{ steps.semantic_release.outputs.next_version }}"
+        echo "Next version: ${{ steps.semantic_release.outputs.tags_and_versions }}"
         echo "Tag: ${{ steps.semantic_release.outputs.tag }}"
 
     - name: Sample Release Step
