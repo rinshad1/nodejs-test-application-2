@@ -23,6 +23,8 @@ jobs:
 
       - name: Conventional Semantic Release
         uses: ahmadnassri/action-semantic-release@v2.2.8
+        with:
+          branches: main # You need to define the release branches here
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
