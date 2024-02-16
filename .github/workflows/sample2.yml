@@ -73,6 +73,7 @@ jobs:
 
         - name: Setup Node.js environment
           uses: actions/setup-node@v3
+
         - name: Semantic Release dry run
           id: semantic      
           run: |
@@ -84,6 +85,9 @@ jobs:
             
         - name: Use the version
           run: echo "The version is ${{ steps.semantic.outputs.version }}"
+      
+        - name: Use the updated version in subsequent steps
+          run: echo "The updated version is ${{ steps.semantic.outputs.version }}"
 
 
 # # jobs:
