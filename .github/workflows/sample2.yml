@@ -28,7 +28,7 @@ jobs:
               git fetch --depth=1 origin +refs/tags/*:refs/tags/*
               
               # Get the latest tag (version)
-              LATEST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+              LATEST_TAG=$(git describe --exact-match --tags $(git log -n1 --pretty='%h'))
               echo "Current version-1: $LATEST_TAG"
 
               # If no tags found, start with 0.0.0
