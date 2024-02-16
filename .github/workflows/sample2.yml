@@ -1,21 +1,31 @@
 name: sample Test
 
 on:
-    push:
-      branches:
-            - main
-  
-jobs:
-    release:
-      runs-on: ubuntu-latest
-  
-      steps:
-        - name: checkout
-          uses: actions/checkout@v2
-  
-        - name: Conventional Semantic Release
-          uses: ahmadnassri/action-semantic-release@v2.2.8
+  push:
+    branches:
+      - main
 
-          env:
-            NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18' # Set your desired Node.js version here
+
+      - name: Install dependencies
+        working-directory: ./Application # Set the working directory to Application
+        run: npm install
+
+      - name: Conventional Semantic Release
+        working-directory: ./Application # Set the working directory to Application
+        uses: ahmadnassri/action-semantic-release@v2.2.8
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
