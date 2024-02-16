@@ -33,7 +33,7 @@ jobs:
 
               # If no tags found, start with 0.0.0
               if [ -z "$LATEST_TAG" ]; then
-                LATEST_TAG="v0.0.0"
+                LATEST_TAG="0.0.0"
               fi
               
               echo "Current version: $LATEST_TAG"
@@ -55,7 +55,7 @@ jobs:
                 PATCH=$((PATCH+1))
               fi
               
-              NEW_TAG="$MAJOR.$MINOR.$PATCH"
+              NEW_TAG=v"$MAJOR.$MINOR.$PATCH"
               echo "New version: $NEW_TAG"
               
               # Tag the new version
