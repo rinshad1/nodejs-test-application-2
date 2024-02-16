@@ -13,8 +13,9 @@ jobs:
         - name: checkout
           uses: actions/checkout@v2
   
-        - name: semantic-release
-          uses: ahmadnassri/action-semantic-release@v2
+        - name: Conventional Semantic Release
+          uses: ahmadnassri/action-semantic-release@v2.2.8
+
           env:
             NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
