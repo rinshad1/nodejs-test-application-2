@@ -1,4 +1,4 @@
-name: sample Test
+name: Semantic Release
 
 on:
   push:
@@ -8,23 +8,17 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    concurrency: release
+    permissions:
+      id-token: write
+      contents: write
 
     steps:
-      - name: checkout
-        uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-
-      - name: Change directory to Application
-        run: cd Application
-
-      - name: Conventional Semantic Release
-        uses: ahmadnassri/action-semantic-release@v2.2.8
-        with:
-          branches: main # You need to define the release branches here
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Python Semantic Release
+      uses: python-semantic-release/python-semantic-release@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
