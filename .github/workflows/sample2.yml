@@ -23,10 +23,18 @@ jobs:
         run: npm install
 
       - name: Conventional Semantic Release
-        working-directory: ./Application # Set the working directory to Application
-        run: npx semantic-release
+        working-directory: ./Application
+        run: |
+          npx semantic-release
+          echo "Current version: ${{ steps.current_version.outputs.version }}"
+          echo "Previous version: ${{ steps.previous_version.outputs.version }}"
+          echo "Next version: ${{ steps.next_version.outputs.version }}"
+          echo "Current tag: ${{ steps.current_tag.outputs.tag }}"
+          echo "Previous tag: ${{ steps.previous_tag.outputs.tag }}"
+          echo "Next tag: ${{ steps.next_tag.outputs.tag }}"
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
       
       
