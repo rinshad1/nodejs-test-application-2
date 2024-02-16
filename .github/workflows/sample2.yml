@@ -26,4 +26,10 @@ jobs:
 
     - name: Get version information
       run: |
-        echo "New version: ${{ steps.semantic_release.outputs.new_version }}"; echo "Previous version: ${{ steps.semantic_release.outputs.previous_version }}"; echo "Next version: ${{ steps.semantic_release.outputs.next_version }}"; echo "Tag: ${{ steps.semantic_release.outputs.tag }}"
+        echo "New version: ${{ steps.semantic_release.outputs.new_version }}"
+        echo "Previous version: ${{ steps.semantic_release.outputs.previous_version }}"
+        echo "Next version: ${{ steps.semantic_release.outputs.next_version }}"
+        echo "Tag: ${{ steps.semantic_release.outputs.tag }}"
+
+    - name: Sample Release Step
+      run: echo "This is a sample release stage"    
