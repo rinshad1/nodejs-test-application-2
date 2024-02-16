@@ -19,6 +19,11 @@ jobs:
         fetch-depth: 0
 
     - name: Python Semantic Release
+      id: semantic_release
       uses: python-semantic-release/python-semantic-release@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Get version information
+      run: |
+        echo "New version: ${{ steps.semantic_release.outputs.new_version }}"; echo "Previous version: ${{ steps.semantic_release.outputs.previous_version }}"; echo "Next version: ${{ steps.semantic_release.outputs.next_version }}"; echo "Tag: ${{ steps.semantic_release.outputs.tag }}"
