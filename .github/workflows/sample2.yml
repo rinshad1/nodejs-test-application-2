@@ -22,45 +22,111 @@ jobs:
               git config --global user.name 'GitHub Actions'
               git config --global user.email 'mailto:actions@github.com'
       
-          - name: Parse commit messages and update version
+              - name: Read Current Version from GitHub tags
+              id: read-version
+              run: |
+                # Get the latest tag from GitHub repository
+                LATEST_TAG=$(git describe --tags --abbrev=0)
+                echo "::set-output name=version::$LATEST_TAG"
+            
+          - name: Determine semantic version
+            id: determine-version
             run: |
-              # Fetch all tags
-              git fetch --depth=1 origin +refs/tags/*:refs/tags/*
-              
-              # Get the latest tag (version)
-              LATEST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
-              echo "Current version-1: $LATEST_TAG"
-
-              # If no tags found, start with 0.0.0
-              if [ -z "$LATEST_TAG" ]; then
-                LATEST_TAG="0.0.0"
+              # Extract commit message from the latest commit
+              COMMIT_MESSAGE=$(git log -1 --pretty=%B)
+          
+              # Determine the version type based on the commit message
+              if echo "$COMMIT_MESSAGE" | grep -q 'BREAKING CHANGE'; then
+                echo "::set-output name=version::major"
+              elif echo "$COMMIT_MESSAGE" | grep -q 'FEAT'; then
+                echo "::set-output name=version::minor"
+              else
+                echo "::set-output name=version::patch"
               fi
-              
-              echo "Current version: $LATEST_TAG"
-              
-              # Extract MAJOR, MINOR, and PATCH versions
-              MAJOR=$(echo $LATEST_TAG | cut -d. -f1)
-              MINOR=$(echo $LATEST_TAG | cut -d. -f2)
-              PATCH=$(echo $LATEST_TAG | cut -d. -f3)
-              
-              # Check for 'breaking' and 'feature' in commit messages
-              if git log -1 --pretty=%B | grep -iq breaking; then
-                MAJOR=$((MAJOR+1))
+          
+          - name: Determine version update
+            id: determine-update
+            run: |
+              VERSION=$(echo ${{ steps.determine-version.outputs.version }})
+              if [ "$VERSION" = "major" ]; then
+                echo "::set-output name=update::major"
+              elif [ "$VERSION" = "minor" ]; then
+                echo "::set-output name=update::minor"
+              else
+                echo "::set-output name=update::patch"
+              fi
+          
+          - name: Update Version
+            id: update-version
+            run: |
+              CURRENT_VERSION=$(echo ${{ steps.read-version.outputs.version }})
+              VERSION_TYPE=$(echo ${{ steps.determine-version.outputs.version }})
+          
+              # Parse the version numbers
+              IFS='.' read -r -a VERSION_ARRAY <<< "$CURRENT_VERSION"
+              MAJOR=${VERSION_ARRAY[0]}
+              MINOR=${VERSION_ARRAY[1]}
+              PATCH=${VERSION_ARRAY[2]}
+          
+              # Update version numbers based on the release type
+              if [ "$VERSION_TYPE" = "major" ]; then
+                MAJOR=$((MAJOR + 1))
                 MINOR=0
                 PATCH=0
-              elif git log -1 --pretty=%B | grep -iq feature; then
-                MINOR=$((MINOR+1))
+              elif [ "$VERSION_TYPE" = "minor" ]; then
+                MINOR=$((MINOR + 1))
                 PATCH=0
               else
-                PATCH=$((PATCH+1))
+                PATCH=$((PATCH + 1))
               fi
+          
+              # Generate the new version
+              NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+              echo "$NEW_VERSION" > VERSION
+              echo "::set-output name=new_version::$NEW_VERSION"
+          
+          
+          
+          ##################
+          # - name: Parse commit messages and update version
+          #   run: |
+          #     # Fetch all tags
+          #     git fetch --depth=1 origin +refs/tags/*:refs/tags/*
               
-              NEW_TAG="$MAJOR.$MINOR.$PATCH"
-              echo "New version: $NEW_TAG"
+          #     # Get the latest tag (version)
+          #     LATEST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+          #     echo "Current version-1: $LATEST_TAG"
+
+          #     # If no tags found, start with 0.0.0
+          #     if [ -z "$LATEST_TAG" ]; then
+          #       LATEST_TAG="0.0.0"
+          #     fi
               
-              # Tag the new version
-              git tag $NEW_TAG
-              git push origin $NEW_TAG
+          #     echo "Current version: $LATEST_TAG"
+              
+          #     # Extract MAJOR, MINOR, and PATCH versions
+          #     MAJOR=$(echo $LATEST_TAG | cut -d. -f1)
+          #     MINOR=$(echo $LATEST_TAG | cut -d. -f2)
+          #     PATCH=$(echo $LATEST_TAG | cut -d. -f3)
+              
+          #     # Check for 'breaking' and 'feature' in commit messages
+          #     if git log -1 --pretty=%B | grep -iq breaking; then
+          #       MAJOR=$((MAJOR+1))
+          #       MINOR=0
+          #       PATCH=0
+          #     elif git log -1 --pretty=%B | grep -iq feature; then
+          #       MINOR=$((MINOR+1))
+          #       PATCH=0
+          #     else
+          #       PATCH=$((PATCH+1))
+          #     fi
+              
+          #     NEW_TAG="$MAJOR.$MINOR.$PATCH"
+          #     echo "New version: $NEW_TAG"
+              
+          #     # Tag the new version
+          #     git tag $NEW_TAG
+          #     git push origin $NEW_TAG
 
     #############
             
