@@ -91,7 +91,7 @@ jobs:
           
               echo "New version-2: $NEW_VERSION"
           
-          ##################
+          ###################
           # - name: Parse commit messages and update version
           #   run: |
           #     # Fetch all tags
