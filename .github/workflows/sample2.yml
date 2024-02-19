@@ -26,52 +26,25 @@ jobs:
             id: read-version
             run: |
               # Fetch all tags
-                git fetch --depth=1 origin +refs/tags/*:refs/tags/*
-              
+              git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+            
               # Get the latest tag from GitHub repository
               LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
-              echo "::set-output name=version::$LATEST_TAG"
-              echo "Current version-1: $LATEST_TAG"
-        
-          - name: Determine semantic version
-            id: determine-version
-            run: |
-              # Extract commit message from the latest commit
-              COMMIT_MESSAGE=$(git log -1 --pretty=%B)
-          
-              # Determine the version type based on the commit message
-              if echo "$COMMIT_MESSAGE" | grep -q 'BREAKING CHANGE'; then
-                echo "::set-output name=version::major"
-              elif echo "$COMMIT_MESSAGE" | grep -q 'FEAT'; then
-                echo "::set-output name=version::minor"
-              else
-                echo "::set-output name=version::patch"
-              fi
-          
-          - name: Determine version update
-            id: determine-update
-            run: |
-              VERSION=$(echo ${{ steps.determine-version.outputs.version }})
-              if [ "$VERSION" = "major" ]; then
-                echo "::set-output name=update::major"
-              elif [ "$VERSION" = "minor" ]; then
-                echo "::set-output name=update::minor"
-              else
-                echo "::set-output name=update::patch"
-              fi
+              echo "::set-output name=version::${LATEST_TAG}"
+              echo "Current version-1: ${LATEST_TAG}"
           
           - name: Update Version
             id: update-version
             run: |
               CURRENT_VERSION=$(echo ${{ steps.read-version.outputs.version }})
               VERSION_TYPE=$(echo ${{ steps.determine-version.outputs.version }})
-          
+            
               # Parse the version numbers
-              IFS='.' read -r -a VERSION_ARRAY <<< "$CURRENT_VERSION"
+              IFS='.' read -r -a VERSION_ARRAY <<< "${CURRENT_VERSION#v}" # Remove 'v' from the beginning
               MAJOR=${VERSION_ARRAY[0]}
               MINOR=${VERSION_ARRAY[1]}
               PATCH=${VERSION_ARRAY[2]}
-          
+            
               # Update version numbers based on the release type
               if [ "$VERSION_TYPE" = "major" ]; then
                 MAJOR=$((MAJOR + 1))
@@ -83,13 +56,14 @@ jobs:
               else
                 PATCH=$((PATCH + 1))
               fi
-          
+            
               # Generate the new version
-              NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+              NEW_VERSION="v${MAJOR}.${MINOR}.${PATCH}" # Add 'v' to the beginning
               echo "$NEW_VERSION" > VERSION
               echo "::set-output name=new_version::$NEW_VERSION"
-          
+            
               echo "New version-2: $NEW_VERSION"
+          
           
           ###################
           # - name: Parse commit messages and update version
