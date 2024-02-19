@@ -100,7 +100,7 @@ jobs:
                 
           
           
-          ###################
+          ####################
           # - name: Parse commit messages and update version
           #   run: |
           #     # Fetch all tags
