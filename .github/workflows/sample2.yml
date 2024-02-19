@@ -33,6 +33,46 @@ jobs:
               echo "::set-output name=version::${LATEST_TAG}"
               echo "Current version-1: ${LATEST_TAG}"
           
+              - name: Determine semantic version
+              id: determine-version
+              run: |
+                # Extract commit message from the latest commit
+                COMMIT_MESSAGE=$(git log -1 --pretty=%B)
+            
+                # Determine the version type based on the commit message
+                if echo "$COMMIT_MESSAGE" | grep -q 'BREAKING CHANGE'; then
+                  echo "::set-output name=version::major"
+                elif echo "$COMMIT_MESSAGE" | grep -q 'FEAT'; then
+                  echo "::set-output name=version::minor"
+                else
+                  echo "::set-output name=version::patch"
+                fi
+          - name: Determine semantic version
+            id: determine-version
+            run: |
+              # Extract commit message from the latest commit
+              COMMIT_MESSAGE=$(git log -1 --pretty=%B)
+          
+              # Determine the version type based on the commit message
+              if echo "$COMMIT_MESSAGE" | grep -q 'BREAKING CHANGE'; then
+                echo "::set-output name=version::major"
+              elif echo "$COMMIT_MESSAGE" | grep -q 'FEAT'; then
+                echo "::set-output name=version::minor"
+              else
+                echo "::set-output name=version::patch"
+              fi
+          - name: Determine version update
+            id: determine-update
+            run: |
+              VERSION=$(echo ${{ steps.determine-version.outputs.version }})
+              if [ "$VERSION" = "major" ]; then
+                echo "::set-output name=update::major"
+              elif [ "$VERSION" = "minor" ]; then
+                echo "::set-output name=update::minor"
+              else
+                echo "::set-output name=update::patch"
+              fi  
+
           - name: Update Version
             id: update-version
             run: |
