@@ -25,9 +25,13 @@ jobs:
           - name: Read Current Version from GitHub tags
             id: read-version
             run: |
+              # Fetch all tags
+                git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+              
               # Get the latest tag from GitHub repository
               LATEST_TAG=$(git describe --tags --abbrev=0)
               echo "::set-output name=version::$LATEST_TAG"
+              echo "Current version-1: $LATEST_TAG"
         
           - name: Determine semantic version
             id: determine-version
