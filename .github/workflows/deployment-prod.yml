@@ -33,7 +33,7 @@ jobs:
       uses: aws-actions/amazon-ecr-login@v1  
     - name: Set up Git
       run: |
-        git config --global user.name 'GitHub Actions'
+        git config --global user.name 'GitHub Actions Prod'
         git config --global user.email 'github:actions@github.com'
 
     - name: Read Current Version from GitHub tags
@@ -46,63 +46,64 @@ jobs:
         LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
         echo "::set-output name=version::${LATEST_TAG}"
         echo "Current version-1: ${LATEST_TAG}"
+        echo "$LATEST_TAG" > VERSION
     
-    - name: Determine semantic version
-      id: determine-version
-      run: |
-        # Extract commit message from the latest commit
-        COMMIT_MESSAGE=$(git log -1 --pretty=%B)
+    # - name: Determine semantic version
+    #   id: determine-version
+    #   run: |
+    #     # Extract commit message from the latest commit
+    #     COMMIT_MESSAGE=$(git log -1 --pretty=%B)
     
-        # Determine the version type based on the commit message
-        if echo "$COMMIT_MESSAGE" | grep -q 'BREAKING CHANGE'; then
-          echo "::set-output name=version::major"
-        elif echo "$COMMIT_MESSAGE" | grep -q 'FEAT'; then
-          echo "::set-output name=version::minor"
-        else
-          echo "::set-output name=version::patch"
-        fi
-    - name: Determine version update
-      id: determine-update
-      run: |
-        VERSION=$(echo ${{ steps.determine-version.outputs.version }})
-        if [ "$VERSION" = "major" ]; then
-          echo "::set-output name=update::major"
-        elif [ "$VERSION" = "minor" ]; then
-          echo "::set-output name=update::minor"
-        else
-          echo "::set-output name=update::patch"
-        fi  
+    #     # Determine the version type based on the commit message
+    #     if echo "$COMMIT_MESSAGE" | grep -q 'BREAKING CHANGE'; then
+    #       echo "::set-output name=version::major"
+    #     elif echo "$COMMIT_MESSAGE" | grep -q 'FEAT'; then
+    #       echo "::set-output name=version::minor"
+    #     else
+    #       echo "::set-output name=version::patch"
+    #     fi
+    # - name: Determine version update
+    #   id: determine-update
+    #   run: |
+    #     VERSION=$(echo ${{ steps.determine-version.outputs.version }})
+    #     if [ "$VERSION" = "major" ]; then
+    #       echo "::set-output name=update::major"
+    #     elif [ "$VERSION" = "minor" ]; then
+    #       echo "::set-output name=update::minor"
+    #     else
+    #       echo "::set-output name=update::patch"
+    #     fi  
 
-    - name: Update Version
-      id: update-version
-      run: |
-        CURRENT_VERSION=$(echo ${{ steps.read-version.outputs.version }})
-        VERSION_TYPE=$(echo ${{ steps.determine-version.outputs.version }})
+    # - name: Update Version
+    #   id: update-version
+    #   run: |
+    #     CURRENT_VERSION=$(echo ${{ steps.read-version.outputs.version }})
+    #     VERSION_TYPE=$(echo ${{ steps.determine-version.outputs.version }})
       
-        # Parse the version numbers
-        IFS='.' read -r -a VERSION_ARRAY <<< "${CURRENT_VERSION#v}" # Remove 'v' from the beginning
-        MAJOR=${VERSION_ARRAY[0]}
-        MINOR=${VERSION_ARRAY[1]}
-        PATCH=${VERSION_ARRAY[2]}
+    #     # Parse the version numbers
+    #     IFS='.' read -r -a VERSION_ARRAY <<< "${CURRENT_VERSION#v}" # Remove 'v' from the beginning
+    #     MAJOR=${VERSION_ARRAY[0]}
+    #     MINOR=${VERSION_ARRAY[1]}
+    #     PATCH=${VERSION_ARRAY[2]}
       
-        # Update version numbers based on the release type
-        if [ "$VERSION_TYPE" = "major" ]; then
-          MAJOR=$((MAJOR + 1))
-          MINOR=0
-          PATCH=0
-        elif [ "$VERSION_TYPE" = "minor" ]; then
-          MINOR=$((MINOR + 1))
-          PATCH=0
-        else
-          PATCH=$((PATCH + 1))
-        fi
+    #     # Update version numbers based on the release type
+    #     if [ "$VERSION_TYPE" = "major" ]; then
+    #       MAJOR=$((MAJOR + 1))
+    #       MINOR=0
+    #       PATCH=0
+    #     elif [ "$VERSION_TYPE" = "minor" ]; then
+    #       MINOR=$((MINOR + 1))
+    #       PATCH=0
+    #     else
+    #       PATCH=$((PATCH + 1))
+    #     fi
       
-        # Generate the new version
-        NEW_VERSION="v${MAJOR}.${MINOR}.${PATCH}" # Add 'v' to the beginning
-        echo "$NEW_VERSION" > VERSION
-        echo "::set-output name=new_version::$NEW_VERSION"
+    #     # Generate the new version
+    #     NEW_VERSION="v${MAJOR}.${MINOR}.${PATCH}" # Add 'v' to the beginning
+    #     echo "$NEW_VERSION" > VERSION
+    #     echo "::set-output name=new_version::$NEW_VERSION"
       
-        echo "New version-2: $NEW_VERSION"
+    #     echo "New version-2: $NEW_VERSION"
 
     - name: Tag and Push New Version
       run: |
