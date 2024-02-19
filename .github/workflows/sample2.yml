@@ -89,6 +89,15 @@ jobs:
               echo "::set-output name=new_version::$NEW_VERSION"
             
               echo "New version-2: $NEW_VERSION"
+
+          - name: Tag and Push New Version
+            run: |
+                NEW_TAG=$(cat VERSION)
+                git tag $NEW_TAG
+                git push origin $NEW_TAG
+            env:
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                
           
           
           ###################
