@@ -150,7 +150,7 @@ jobs:
       env:
         repourl: ${{ vars.PROD_REPO_URL }}
       run: |
-        sed -i "s#REPO_URL#${repourl}#g" helm/chart/values.yaml    
+        sed -i "s#REPO_URL#${repourl}#g" helm/chart/values-prod.yaml    
 
     - name: Deploy to EKS       
       run: |
