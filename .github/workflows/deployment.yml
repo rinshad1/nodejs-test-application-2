@@ -6,9 +6,9 @@ on:
       - main
 
 env:
-  ECR_REPOSITORY: repo-dev
-  EKS_CLUSTER_NAME: eks-cluster-123 
-  AWS_REGION: us-west-2
+  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY_DEV }}
+  EKS_CLUSTER_NAME: ${{ vars.EKS_CLUSTER_NAME }}
+  AWS_REGION: ${{ vars.AWS_REGION }}
 
 jobs:
    build:
@@ -44,7 +44,7 @@ jobs:
           # Get the latest tag from GitHub repository
           LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
           echo "::set-output name=version::${LATEST_TAG}"
-          echo "Current version-1: ${LATEST_TAG}"
+          echo "Current version: ${LATEST_TAG}"
       
       - name: Determine semantic version
         id: determine-version
@@ -101,7 +101,7 @@ jobs:
           echo "$NEW_VERSION" > VERSION
           echo "::set-output name=new_version::$NEW_VERSION"
         
-          echo "New version-2: $NEW_VERSION"
+          echo "New version: $NEW_VERSION"
 
       - name: Tag and Push New Version
         run: |
