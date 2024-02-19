@@ -29,7 +29,7 @@ jobs:
                 git fetch --depth=1 origin +refs/tags/*:refs/tags/*
               
               # Get the latest tag from GitHub repository
-              LATEST_TAG=$(git describe --tags --abbrev=0)
+              LATEST_TAG=$(git describe --tags --abbrev=0 --exact-match 2>/dev/null || echo "No Tags Found")
               echo "::set-output name=version::$LATEST_TAG"
               echo "Current version-1: $LATEST_TAG"
         
