@@ -30,6 +30,7 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1  
+
       - name: Set up Git
         run: |
           git config --global user.name 'GitHub Actions'
@@ -60,6 +61,7 @@ jobs:
           else
             echo "::set-output name=version::patch"
           fi
+
       - name: Determine version update
         id: determine-update
         run: |
@@ -137,7 +139,7 @@ jobs:
 
       - name: Connect VPN
         run: |
-          pritunl-client add ./user-15.tar
+          pritunl-client add ./user-16.tar
           pritunl-client start "$(pritunl-client list | awk 'NR>2 {print $2}' | tr -d '[:space:]')" --password ${{ secrets.PRITUNL_PIN }} 
         
       - name: Update kube config
