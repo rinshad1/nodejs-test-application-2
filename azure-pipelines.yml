@@ -23,11 +23,28 @@ stages:
 - stage: Build
   displayName: Build and push stage
   jobs:
+      
   - job: Build
     displayName: Build
     pool:
       vmImage: $(vmImageName)
     steps:
+    - task: SonarQubePrepare@5
+      inputs:
+        SonarQube: 'sonarqube'
+        scannerMode: 'CLI'
+        configMode: 'manual'
+        cliProjectKey: 'project-1_project-1_AY6jlnqo7N3U2fXEsoOm'
+        cliSources: '.'
+
+    - task: SonarQubeAnalyze@5
+      inputs:
+        jdkversion: 'JAVA_HOME_11_X64'
+
+    - task: SonarQubePublish@5
+      inputs:
+        pollingTimeoutSec: '300'
+
     - task: Docker@2
       displayName: Build and push an image to container registry
       inputs:
