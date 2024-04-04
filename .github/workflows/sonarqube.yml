@@ -67,9 +67,20 @@
 
 
 
-name: SonarQube Integration
-  sonarqube:
-    name: SonarQube Integration
+name: SonarQube analysis
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  pull-requests: read # allows SonarQube to decorate PRs with analysis results
+
+jobs:
+  Analysis:
     runs-on: ubuntu-latest
     
     steps:
