@@ -28,8 +28,8 @@ stages:
     displayName: Build
     pool:
       name: Default
-      demands:
-      - agent.name -equals SonarQube
+      demands: myCustomCapability
+      # - agent.name -equals SonarQube
     steps:
     - task: SonarQubePrepare@5
       inputs:
