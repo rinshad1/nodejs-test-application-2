@@ -40,8 +40,8 @@ stages:
         cliSources: '.'
 
     - task: SonarQubeAnalyze@5
-      inputs:
-        jdkversion: 'JAVA_HOME'
+      # inputs:
+      #   jdkversion: 'JAVA_HOME'
 
     - task: SonarQubePublish@5
       inputs:
