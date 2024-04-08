@@ -27,7 +27,9 @@ stages:
   - job: Build
     displayName: Build
     pool:
-      vmImage: $(vmImageName)
+      name: Default
+      demands:
+      - agent.name -equals SonarQube
     steps:
     - task: SonarQubePrepare@5
       inputs:
