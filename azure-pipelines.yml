@@ -27,9 +27,9 @@ stages:
   - job: Build
     displayName: Build
     pool:
-      vmImage: ubuntu-latest
-      # name: Default
-      # demands: myCustomCapability
+      # vmImage: ubuntu-latest
+      name: Default
+      demands: myCustomCapability
       # - agent.name -equals SonarQube
     steps:
     # - task: SonarQubePrepare@5
@@ -41,7 +41,10 @@ stages:
     #     cliProjectName: 'project-1'
     #     cliSources: '.'
     #     extraProperties: -X
-
+    - task: Bash@3
+      inputs:
+        targetType: 'inline'
+        script: '/home/rinshad/sonar-scanner/bin/sonar-scanner -Dsonar.projectKey=project-1_project-1_AY6jlnqo7N3U2fXEsoOm -Dsonar.sources=./nodejs-test-application-2 -Dsonar.host.url=http://20.127.168.190:9000 -Dsonar.token=sqp_accb5956ce919e4139e9cd4543a7fc035330e94c'
     - task: SonarQubeAnalyze@5
       # inputs:
       #   jdkversion: 'JAVA_HOME'
