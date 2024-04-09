@@ -13,7 +13,7 @@ variables:
   dockerRegistryServiceConnection: '4fd4c33e-2e9e-4cb1-8b3a-7894c610d465'
   imageRepository: 'nodejstestapplication'
   containerRegistry: 'registry2111.azurecr.io'
-  dockerfilePath: '$(Build.SourcesDirectory)/Application/Dockerfile'
+  dockerfilePath: 'Application/Dockerfile'
   tag: '$(Build.BuildId)'
 
   # Agent VM image name
@@ -41,6 +41,12 @@ stages:
     #     cliProjectName: 'project-1'
     #     cliSources: '.'
     #     extraProperties: -X
+    - task: dependency-check-build-task@6
+      inputs:
+        projectName: '1-projecr'
+        scanPath: '$(Build.SourcesDirectory)'
+        format: 'HTML'
+        uploadReports: true/
     - task: Bash@3
       inputs:
         targetType: 'inline'
