@@ -40,6 +40,7 @@ stages:
         cliProjectKey: 'project-1_project-1_AY6jlnqo7N3U2fXEsoOm'
         cliProjectName: 'project-1'
         cliSources: '.'
+        extraProperties: -X
 
     - task: SonarQubeAnalyze@5
       # inputs:
