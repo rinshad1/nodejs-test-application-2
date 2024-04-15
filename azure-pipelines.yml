@@ -45,7 +45,7 @@ stages:
       inputs:
         projectName: '1-projecr'
         scanPath: '$(Build.SourcesDirectory)'
-        format: 'HTML'
+        format: 'HTML, JSON'
         uploadReports: true
     - task: Bash@3
       inputs:
