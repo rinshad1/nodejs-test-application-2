@@ -54,6 +54,19 @@ stages:
     #   # inputs:
     #   #   jdkversion: 'JAVA_HOME'
 
+- stage: Build2
+  displayName: Build and push stage2
+  jobs:
+      
+  - job: Build2
+    displayName: Build2
+    pool:
+      vmImage: ubuntu-latest
+      # name: Default
+      # demands: myCustomCapability
+      # - agent.name -equals SonarQube
+    steps:
+
     - task: Docker@2
       displayName: Build and push an image to container registry
       inputs:
