@@ -20,27 +20,18 @@ variables:
   vmImageName: 'ubuntu-latest'
 
 stages:
-- stage: Build
-  displayName: Build and push stage
+- stage: Scan
+  displayName: Scanning
   jobs:
       
-  - job: Build
-    displayName: Build
+  - job: Scan
+    displayName: Scan
     pool:
       # vmImage: ubuntu-latest
       name: Default
       demands: myCustomCapability
       # - agent.name -equals SonarQube
     steps:
-    # - task: SonarQubePrepare@5
-    #   inputs:
-    #     SonarQube: 'soanrqube2'
-    #     scannerMode: 'CLI'
-    #     configMode: 'manual'
-    #     cliProjectKey: 'project-1_project-1_AY6jlnqo7N3U2fXEsoOm'
-    #     cliProjectName: 'project-1'
-    #     cliSources: '.'
-    #     extraProperties: -X
     - task: dependency-check-build-task@6
       inputs:
         projectName: '1-projecr'
@@ -50,23 +41,18 @@ stages:
       inputs:
         targetType: 'inline'
         script: '/home/rinshad/sonar-scanner/bin/sonar-scanner -Dsonar.projectKey=project-1_project-1_AY6jlnqo7N3U2fXEsoOm -Dsonar.sources=$(Build.SourcesDirectory)/Application/ -Dsonar.host.url=http://20.127.168.190:9000 -Dsonar.token=sqp_accb5956ce919e4139e9cd4543a7fc035330e94c'
-    # - task: SonarQubeAnalyze@5
-    #   # inputs:
-    #   #   jdkversion: 'JAVA_HOME'
 
-- stage: Build2
-  displayName: Build and push stage2
+
+- stage: Build
+  displayName: Build and push stage
   jobs:
       
-  - job: Build2
-    displayName: Build2
+  - job: Build
+    displayName: Build
     pool:
       vmImage: ubuntu-latest
-      # name: Default
-      # demands: myCustomCapability
-      # - agent.name -equals SonarQube
-    steps:
 
+    steps:
     - task: Docker@2
       displayName: Build and push an image to container registry
       inputs:
