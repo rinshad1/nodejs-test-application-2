@@ -14,7 +14,8 @@ variables:
   imageRepository: 'nodejstestapplication'
   containerRegistry: 'registry2111.azurecr.io'
   dockerfilePath: '$(Build.SourcesDirectory)/Application/Dockerfile'
-  tag: '$(Build.BuildId)'
+  tag1: '$(Build.BuildId)'
+  tag2: 'latest'
 
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
@@ -65,4 +66,5 @@ stages:
         dockerfile: $(dockerfilePath)
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
-          $(tag)
+          $(tag1)
+          $(tag2)
