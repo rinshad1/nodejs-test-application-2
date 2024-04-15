@@ -44,7 +44,7 @@ stages:
     - task: dependency-check-build-task@6
       inputs:
         projectName: '1-projecr'
-        scanPath: '$(Build.SourcesDirectory)'
+        scanPath: '$(Build.SourcesDirectory)/Application'
         format: 'HTML, JSON'
         uploadReports: true
     - task: Bash@3
