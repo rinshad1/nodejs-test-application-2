@@ -46,11 +46,6 @@ stages:
         projectName: '1-projecr'
         scanPath: '$(Build.SourcesDirectory)/Application'
         format: 'HTML, JSON'
-    - task: PublishBuildArtifacts@1
-      inputs:
-        PathtoPublish: '/home/rinshad/myagent/_work/1/TestResults/dependency-check/'
-        ArtifactName: 'OWASP Report'
-        publishLocation: 'Container'
     - task: Bash@3
       inputs:
         targetType: 'inline'
@@ -58,10 +53,6 @@ stages:
     # - task: SonarQubeAnalyze@5
     #   # inputs:
     #   #   jdkversion: 'JAVA_HOME'
-
-    - task: SonarQubePublish@5
-      inputs:
-        pollingTimeoutSec: '300'
 
     - task: Docker@2
       displayName: Build and push an image to container registry
