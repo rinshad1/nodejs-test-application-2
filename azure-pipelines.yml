@@ -50,9 +50,7 @@ stages:
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
         ArtifactName: 'OWASP Report'
-        publishLocation: 'FilePath'
-        TargetPath: '/home/rinshad/myagent/_work/1/TestResults/dependency-check/*'
-        uploadReports: true
+        publishLocation: 'Container'
     - task: Bash@3
       inputs:
         targetType: 'inline'
