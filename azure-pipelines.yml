@@ -42,6 +42,10 @@ stages:
         targetType: 'inline'
         script: '/home/rinshad/sonar-scanner/bin/sonar-scanner -Dsonar.projectKey=project-1_project-1_AY6jlnqo7N3U2fXEsoOm -Dsonar.sources=$(Build.SourcesDirectory)/Application/ -Dsonar.host.url=http://20.127.168.190:9000 -Dsonar.token=sqp_accb5956ce919e4139e9cd4543a7fc035330e94c'
 
+    - task: Bash@3
+      inputs:
+        targetType: 'inline'
+        script: 'echo $(Build.BuildId)' 
 
 - stage: Build
   displayName: Build and push stage
